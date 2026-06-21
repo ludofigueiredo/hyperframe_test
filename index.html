@@ -132,7 +132,7 @@
       letter-spacing: -0.03em;
       line-height: 1;
       white-space: nowrap;
-      color: var(--faint);
+      color: #99c9f5;
     }
   </style>
 </head>
@@ -181,7 +181,7 @@
     const LEVEL_START = TYPE_START + PHRASE_DUR;   /* 1.2s */
     const LEVEL_DUR = 0.4;
     const LEVEL_AT = LEVEL_START + LEVEL_DUR;      /* 1.6s */
-    const HOLD = 0.4;
+    const HOLD = 0.7;
     const SCROLL_AT = LEVEL_AT + HOLD;             /* 2.6s */
 
     const typeEl = document.getElementById("type-text");
@@ -235,10 +235,10 @@
         const dist = Math.abs(i - scroll.pos);
         if (dist < 0.4) {
           items[i].style.opacity = "1";
-          items[i].style.color = "#1d1d1f";
+          items[i].style.color = "#0066cc";
         } else {
           items[i].style.opacity = String(scroll.reveal);
-          items[i].style.color = dist < 1.2 ? "#9a9aa0" : "#c7c7cc";
+          items[i].style.color = dist < 1.2 ? "#4d9fe8" : "#99c9f5";
         }
       }
     }
