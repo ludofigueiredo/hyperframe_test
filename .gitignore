@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Renders / build output
+renders/
+*.mp4
+*.mov
+*.webm
+
+# Reference media (large, not part of the composition)
+capture/assets/refs/
+**/_frames/
+*.gif
+
+# HyperFrames working dirs
+.hyperframes/
+.thumbnails/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
