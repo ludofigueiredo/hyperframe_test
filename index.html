@@ -47,7 +47,6 @@
       inset: 0;
       width: 1080px;
       height: 1080px;
-      opacity: 0.18;
     }
 
     /* Scene */
@@ -147,15 +146,8 @@
     <!-- Iridescent background canvas -->
     <canvas data-hf-id="hf-eo1d" id="bg-canvas" width="1080" height="1080"></canvas>
 
-    <!-- Dot-grid overlay (SVG pattern, matches ref texture) -->
-    <svg data-hf-id="hf-uxzk" id="bg-dots" xmlns="http://www.w3.org/2000/svg">
-      <defs data-hf-id="hf-mh0t">
-        <pattern data-hf-id="hf-h32h" id="dot-grid" x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse">
-          <circle data-hf-id="hf-305w" cx="6" cy="6" r="1" fill="#5ba8d8" />
-        </pattern>
-      </defs>
-      <rect data-hf-id="hf-26tq" width="1080" height="1080" fill="url(#dot-grid)" />
-    </svg>
+    <!-- Dot-grid overlay — animated ripple canvas -->
+    <canvas data-hf-id="hf-lhbl" id="bg-dots" width="1080" height="1080"></canvas>
 
     <!-- SCENE 1: Typewriter + keyword ticker (0–6s) -->
     <div data-hf-id="hf-67e6" id="scene1" class="clip" data-start="0" data-duration="6" data-track-index="0" data-layout-allow-overlap="true">
@@ -258,18 +250,84 @@
     renderBg(0);
 
     /* -----------------------------------------------
+       DOT RIPPLE
+       Grid of dots 12px apart. Each dot's opacity is
+       driven by a radial sine wave emanating from the
+       center, repeating every ~1.4s. Multiple rings
+       travel outward simultaneously (phase offsets).
+       Base dot color slightly darker than background
+       so it stays readable but never distracting.
+    ----------------------------------------------- */
+    const dotCanvas = document.getElementById("bg-dots");
+    const dctx = dotCanvas.getContext("2d");
+    const GRID  = 12;   /* spacing between dots */
+    const DOT_R = 1.0;  /* dot radius px */
+    const COLS  = Math.ceil(W / GRID);
+    const ROWS  = Math.ceil(H / GRID);
+    const CX    = W / 2;
+    const CY    = H / 2;
+    /* Max distance from center to corner */
+    const MAX_D = Math.sqrt(CX * CX + CY * CY);
+
+    /* Wave params */
+    const WAVE_SPEED    = 220;   /* px per second the ring travels */
+    const WAVE_WIDTH    = 160;   /* px — width of one sine lobe */
+    const WAVE_INTERVAL = 1.4;   /* seconds between successive rings */
+    const NUM_RINGS     = 4;     /* concurrent rings */
+    const BASE_ALPHA    = 0.13;  /* resting dot opacity */
+    const PEAK_ALPHA    = 0.30;  /* dot opacity at wave crest */
+
+    function renderDots(tSec) {
+      dctx.clearRect(0, 0, W, H);
+
+      for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+          const x = col * GRID + GRID / 2;
+          const y = row * GRID + GRID / 2;
+          const dist = Math.sqrt((x - CX) * (x - CX) + (y - CY) * (y - CY));
+
+          /* Sum contributions from all concurrent rings */
+          let wave = 0;
+          for (let k = 0; k < NUM_RINGS; k++) {
+            const ringT  = tSec - k * WAVE_INTERVAL;
+            const front  = ringT * WAVE_SPEED;          /* leading edge px */
+            const delta  = dist - front;                 /* signed dist to front */
+            if (delta > -WAVE_WIDTH && delta < 0) {
+              /* inside the ring — sine envelope, 0 at edges, 1 at center */
+              const phase = (delta / WAVE_WIDTH) * Math.PI;   /* -π to 0 */
+              wave += Math.sin(phase) * Math.sin(phase);       /* sin² ≥ 0 */
+            }
+          }
+          wave = Math.min(wave, 1);
+
+          const alpha = BASE_ALPHA + (PEAK_ALPHA - BASE_ALPHA) * wave;
+          dctx.beginPath();
+          dctx.arc(x, y, DOT_R, 0, Math.PI * 2);
+          dctx.fillStyle = `rgba(0,0,0,${alpha.toFixed(3)})`;
+          dctx.fill();
+        }
+      }
+    }
+
+    renderDots(0);
+
+    /* -----------------------------------------------
        MAIN TIMELINE
     ----------------------------------------------- */
     window.__timelines = window.__timelines || {};
     const tl = gsap.timeline({ paused: true });
 
-    /* Drive background from timeline time */
+    /* Drive both layers from timeline time */
     const bgDriver = { t: 0 };
     tl.to(bgDriver, {
       t: 1,
       duration: 6,
       ease: "none",
-      onUpdate() { renderBg(bgDriver.t); }
+      onUpdate() {
+        const tSec = bgDriver.t * 6;
+        renderBg(bgDriver.t);
+        renderDots(tSec);
+      }
     }, 0);
 
     const PHRASE_FIXED = "Bring AI to next";
