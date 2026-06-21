@@ -14,16 +14,21 @@
     }
 
     :root {
-      --bg:      #f5f5f7;
-      --ink:     #1d1d1f;
-      --muted:   #6e6e73;
-      --faint:   #c7c7cc;
-      --accent:  #0066cc;
+      --bg: #f5f5f7;
+      --ink: #1d1d1f;
+      --muted: #6e6e73;
+      --faint: #c7c7cc;
+      --accent: #0066cc;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    html, body {
+    html,
+    body {
       width: 1080px;
       height: 1080px;
       overflow: hidden;
@@ -39,15 +44,11 @@
       overflow: hidden;
     }
 
-    /* =============================================
-       SCENE 1 — Typewriter + scrolling keyword ticker
-       (0–4s)
-       "Bring AI to next " stays fixed; "level" is
-       replaced by a vertical ticker of AI keywords
-       that scrolls upward, the centered word in black
-       and the others faded by distance.
-       ============================================= */
-    #scene1 { position: absolute; inset: 0; }
+    #scene1 {
+      position: absolute;
+      inset: 0;
+    }
+
     #scene1-inner {
       position: absolute;
       inset: 0;
@@ -56,11 +57,6 @@
       justify-content: center;
     }
 
-    /* Centered ONCE, for the whole life of the scene. The line holds
-       the fixed phrase + a fixed-width ticker slot (sized to the
-       widest keyword). Because the ticker width never changes, the
-       whole block's center is computed once and never moves —
-       no GSAP x-shifting. */
     #type-line {
       display: flex;
       align-items: baseline;
@@ -96,29 +92,21 @@
       margin-bottom: 4px;
     }
 
-    /* Ticker — IN FLOW with a FIXED width so the whole line centers
-       once and stays put. Width sized to the widest keyword
-       ("ANALYSIS"/"RESEARCH") so no word ever shifts the center. */
     #ticker-wrap {
       position: relative;
       display: inline-block;
-      width: 320px;           /* fixed — fits widest keyword (WRITING) */
+      width: 320px;
       height: 80px;
-      margin-left: 16px;      /* one word-gap after "next" (space is
-                                 collapsed before an inline-block) */
+      margin-left: 16px;
     }
 
-    /* The masked window — 3 slots tall, centered on the phrase line.
-       Pulled up so the MIDDLE slot's text baseline sits on the phrase
-       baseline (the +6px nudge aligns LEVEL with "Bring AI to next"). */
     #ticker {
       position: absolute;
       left: 0;
-      top: -80px;             /* LEVEL slot sits flush in the wrap's 80px */
+      top: -70px;
       width: 100%;
-      height: 240px;          /* 3 slots × 80px */
+      height: 240px;
       overflow: hidden;
-      /* soft fade top/bottom so neighbors dissolve as they pass */
       -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 34%, #000 66%, transparent 100%);
       mask-image: linear-gradient(to bottom, transparent 0%, #000 34%, #000 66%, transparent 100%);
     }
@@ -146,84 +134,40 @@
       white-space: nowrap;
       color: var(--faint);
     }
-
-    /* =============================================
-       SCENE 2 — Signature (4–6s)
-       ============================================= */
-    #scene2 { position: absolute; inset: 0; }
-    #scene2-inner {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .sig-mask {
-      overflow: hidden;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-    }
-
-    #sig-name {
-      font-family: "Inter", sans-serif;
-      font-size: 48px;
-      font-weight: 600;
-      color: var(--ink);
-      letter-spacing: -0.03em;
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    #sig-title {
-      font-family: "Inter", sans-serif;
-      font-size: 26px;
-      font-weight: 400;
-      color: var(--muted);
-      letter-spacing: -0.01em;
-      text-align: center;
-      white-space: nowrap;
-      margin-top: 12px;
-    }
   </style>
 </head>
 
 <body>
-  <div data-hf-id="hf-ph1f" id="root" data-composition-id="main" data-start="0" data-duration="8" data-width="1080" data-height="1080">
+  <div data-hf-id="hf-ph1f" id="root" data-composition-id="main" data-start="0" data-duration="6" data-width="1080"
+    data-height="1080">
 
     <!-- SCENE 1: Typewriter + keyword ticker (0–6s) -->
-    <div data-hf-id="hf-67e6" id="scene1" class="clip" data-start="0" data-duration="6" data-track-index="0" data-layout-allow-overlap="true">
+    <div data-hf-id="hf-67e6" id="scene1" class="clip" data-start="0" data-duration="6" data-track-index="0"
+      data-layout-allow-overlap="true">
       <div data-hf-id="hf-knmf" id="scene1-inner">
         <div data-hf-id="hf-9jes" id="type-line">
-          <span data-hf-id="hf-49nd" id="phrase-box"><span data-hf-id="hf-0neq" id="type-text"></span><span data-hf-id="hf-w7si" id="ticker-wrap" data-layout-allow-overflow="true">
-            <span data-hf-id="hf-ayox" id="ticker" data-layout-allow-overflow="true">
-              <span data-hf-id="hf-pgsv" id="ticker-inner">
-                <span data-hf-id="hf-lvl0" id="kw-level" class="kw-item"><span data-hf-id="hf-kyjs" id="level-text"></span><span data-hf-id="hf-42e8" id="cursor"></span></span>
-                <span data-hf-id="hf-vipr" class="kw-item">CODE</span>
-                <span data-hf-id="hf-vaag" class="kw-item">DOCS</span>
-                <span data-hf-id="hf-6aji" class="kw-item">FIXING</span>
-                <span data-hf-id="hf-ccc4" class="kw-item">SEARCH</span>
-                <span data-hf-id="hf-b8hu" class="kw-item">WRITING</span>
-                <span data-hf-id="hf-2hvs" class="kw-item">DESIGN</span>
-                <span data-hf-id="hf-gfbn" class="kw-item">AGENTS</span>
-                <span data-hf-id="hf-3q0v" class="kw-item">CODE</span>
-                <span data-hf-id="hf-gncg" class="kw-item">DOCS</span>
-                <span data-hf-id="hf-2a4i" class="kw-item">FIXING</span>
+          <span data-hf-id="hf-49nd" id="phrase-box"><span data-hf-id="hf-0neq" id="type-text"></span><span
+              data-hf-id="hf-w7si" id="ticker-wrap" data-layout-allow-overflow="true">
+              <span data-hf-id="hf-ayox" id="ticker" data-layout-allow-overflow="true">
+                <span data-hf-id="hf-pgsv" id="ticker-inner">
+                  <!-- index 0: LEVEL (typed by cursor) -->
+                  <span data-hf-id="hf-lvl0" id="kw-level" class="kw-item"><span data-hf-id="hf-kyjs"
+                      id="level-text"></span><span data-hf-id="hf-42e8" id="cursor"></span></span>
+                  <!-- indices 1–7: AI keywords -->
+                  <span data-hf-id="hf-vipr" class="kw-item">CODE</span>
+                  <span data-hf-id="hf-vaag" class="kw-item">DOCS</span>
+                  <span data-hf-id="hf-6aji" class="kw-item">FIXING</span>
+                  <span data-hf-id="hf-ccc4" class="kw-item">SEARCH</span>
+                  <span data-hf-id="hf-b8hu" class="kw-item">WRITING</span>
+                  <span data-hf-id="hf-2hvs" class="kw-item">DESIGN</span>
+                  <span data-hf-id="hf-gfbn" class="kw-item">AGENTS</span>
+                  <!-- index 8: LEVEL again — loop illusion -->
+                  <span data-hf-id="hf-lvl1" class="kw-item">LEVEL</span>
+                </span>
               </span>
             </span>
           </span>
-        </span></div>
-      </div>
-    </div>
-
-    <!-- SCENE 2: Signature (6–8s) -->
-    <div data-hf-id="hf-z1je" id="scene2" class="clip" data-start="6" data-duration="2" data-track-index="2">
-      <div data-hf-id="hf-hzkg" id="scene2-inner">
-        <div data-hf-id="hf-mqrh" class="sig-mask" data-layout-allow-overflow="true"><div data-hf-id="hf-0h0z" id="sig-name">Ludovic Figueiredo</div></div>
-        <div data-hf-id="hf-dfyp" class="sig-mask" data-layout-allow-overflow="true"><div data-hf-id="hf-5kxk" id="sig-title">Tech &amp; AI Addict</div></div>
+        </div>
       </div>
     </div>
 
@@ -233,35 +177,21 @@
     window.__timelines = window.__timelines || {};
     const tl = gsap.timeline({ paused: true });
 
-    /* -----------------------------------------------
-       SCENE 1 — Typewriter that rolls into a keyword ticker
-       Phase A (0–~1.3s): type "Bring AI to next " — cursor blinks.
-       Phase B (~1.3s): "LEVEL" appears as the centered ticker word,
-         completing the sentence "Bring AI to next LEVEL".
-       Phase C (~1.7–3.6s): the ticker scrolls — LEVEL rolls up into
-         the AI keywords (ANALYSIS, CODE, DOCS, …) one by one.
-       It's ONE continuous element: LEVEL is just the first item.
-       ----------------------------------------------- */
-    /* Layout is centered ONCE by the fixed-width ticker (sized to the
-       widest keyword) — never shifted. The blue cursor types the fixed
-       phrase, then keeps typing LEVEL directly into the ticker's
-       centered slot. After LEVEL lands, hold 2s, then roll the ticker
-       through the AI keywords. */
-    const PHRASE_FIXED = "Bring AI to next";  /* gap via ticker margin */
-    const WORD_LEVEL   = "LEVEL";
-    const TYPE_START   = 0.25;
-    const PHRASE_DUR   = 0.95;                       /* type the phrase */
-    const LEVEL_START  = TYPE_START + PHRASE_DUR;    /* 1.2s */
-    const LEVEL_DUR    = 0.4;                         /* type LEVEL */
-    const LEVEL_AT     = LEVEL_START + LEVEL_DUR;     /* 1.6s done */
-    const HOLD         = 1.0;                         /* wait after LEVEL */
-    const SCROLL_AT    = LEVEL_AT + HOLD;             /* 2.6s scroll */
+    const PHRASE_FIXED = "Bring AI to next";
+    const WORD_LEVEL = "LEVEL";
+    const TYPE_START = 0.25;
+    const PHRASE_DUR = 0.95;
+    const LEVEL_START = TYPE_START + PHRASE_DUR;   /* 1.2s */
+    const LEVEL_DUR = 0.4;
+    const LEVEL_AT = LEVEL_START + LEVEL_DUR;      /* 1.6s */
+    const HOLD = 1.0;
+    const SCROLL_AT = LEVEL_AT + HOLD;             /* 2.6s */
 
-    const typeEl    = document.getElementById("type-text");
-    const levelEl   = document.getElementById("level-text");
-    const cursorEl  = document.getElementById("cursor");
+    const typeEl = document.getElementById("type-text");
+    const levelEl = document.getElementById("level-text");
+    const cursorEl = document.getElementById("cursor");
 
-    /* Phase A1 — type the fixed phrase into #type-text */
+    /* Type the fixed phrase */
     const driver = { v: 0 };
     tl.to(driver, {
       v: PHRASE_FIXED.length,
@@ -272,7 +202,7 @@
       }
     }, TYPE_START);
 
-    /* Phase A2 — keep typing LEVEL into the ticker's centered slot */
+    /* Type LEVEL into the ticker slot */
     const lvlDriver = { v: 0 };
     tl.to(lvlDriver, {
       v: WORD_LEVEL.length,
@@ -283,7 +213,7 @@
       }
     }, LEVEL_START);
 
-    /* Cursor blinks through typing AND the 2s hold (sin driver) */
+    /* Cursor blink via sin driver */
     const blinkDriver = { p: 0 };
     tl.to(blinkDriver, {
       p: Math.PI * 2 * 8,
@@ -294,17 +224,11 @@
       }
     }, 0);
 
-    /* Scroll mechanics.
-       ITEM_H = 80px, window is 3 slots tall (240px); the MIDDLE slot
-       (top offset 80px) is on the phrase line. item0 (LEVEL) sits in
-       the middle slot at pos=0 → CENTER_OFFSET = 80. */
+    /* Ticker scroll — ends at index 8 (duplicate LEVEL) for loop illusion */
     const ITEM_H = 80;
     const innerEl = document.getElementById("ticker-inner");
-    const CENTER_OFFSET = ITEM_H; /* 80px — item0 (LEVEL) centered */
+    const CENTER_OFFSET = ITEM_H;
 
-    /* scroll.pos = item advanced; reveal = neighbor visibility (0→1).
-       At the start reveal=0 so ONLY the centered LEVEL is visible —
-       no faint keywords peeking before anything happens. */
     const scroll = { pos: 0, reveal: 0 };
     function applyTicker() {
       const y = CENTER_OFFSET - scroll.pos * ITEM_H;
@@ -313,12 +237,9 @@
       for (let i = 0; i < items.length; i++) {
         const dist = Math.abs(i - scroll.pos);
         if (dist < 0.4) {
-          /* centered word — always fully black */
           items[i].style.opacity = "1";
           items[i].style.color = "#1d1d1f";
         } else {
-          /* neighbors — faded by distance AND gated by reveal so they
-             stay invisible until the scroll begins */
           items[i].style.opacity = String(scroll.reveal);
           items[i].style.color = dist < 1.2 ? "#9a9aa0" : "#c7c7cc";
         }
@@ -326,11 +247,8 @@
     }
     applyTicker();
 
-    /* Phase B — hide the cursor right when the scroll starts. */
     tl.set("#cursor", { opacity: 0, display: "none" }, SCROLL_AT);
 
-    /* Reveal the neighbor keywords just before the roll, so the
-       column "fills in" right as motion starts. */
     tl.to(scroll, {
       reveal: 1,
       duration: 0.3,
@@ -338,33 +256,13 @@
       onUpdate: applyTicker
     }, SCROLL_AT - 0.1);
 
-    /* Phase C — roll LEVEL(0) → index 7. power1.inOut for a smooth,
-       continuous scroll with gentle ease in/out. */
+    /* Scroll from LEVEL(0) through 7 keywords and land on LEVEL(8) */
     tl.to(scroll, {
-      pos: 7,
-      duration: 1.9,
-      ease: "power1.inOut",
+      pos: 8,
+      duration: 2.8,
+      ease: "power2.inOut",
       onUpdate: applyTicker
     }, SCROLL_AT);
-
-    /* Fade scene 1 out before signature */
-    tl.to("#scene1-inner", { opacity: 0, duration: 0.3, ease: "power1.in" }, 5.7);
-    tl.set("#scene1-inner", { opacity: 0 }, 6.0);
-
-    /* -----------------------------------------------
-       SCENE 2 — Signature mask-reveal (6–8s)
-       ----------------------------------------------- */
-    tl.set("#scene2-inner", { opacity: 1 }, 6.0);
-
-    tl.fromTo("#sig-name",  { y: 60 }, { y: 0, duration: 0.42, ease: "power3.out" }, 6.2);
-    tl.fromTo("#sig-title", { y: 38 }, { y: 0, duration: 0.38, ease: "power3.out" }, 6.55);
-
-    tl.to("#scene2-inner", { opacity: 0, duration: 0.35, ease: "power1.in" }, 7.55);
-
-    /* Hard kills */
-    tl.set("#scene2-inner", { opacity: 0 }, 8.0);
-    tl.set("#sig-name",  { y: 60 }, 8.0);
-    tl.set("#sig-title", { y: 38 }, 8.0);
 
     window.__timelines["main"] = tl;
   </script>
