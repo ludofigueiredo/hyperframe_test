@@ -153,15 +153,12 @@
                   <!-- index 0: LEVEL (typed by cursor) -->
                   <span data-hf-id="hf-lvl0" id="kw-level" class="kw-item"><span data-hf-id="hf-kyjs"
                       id="level-text"></span><span data-hf-id="hf-42e8" id="cursor"></span></span>
-                  <!-- indices 1–7: AI keywords -->
+                  <!-- indices 1–4: keywords -->
                   <span data-hf-id="hf-vipr" class="kw-item">CODE</span>
-                  <span data-hf-id="hf-vaag" class="kw-item">DOCS</span>
-                  <span data-hf-id="hf-6aji" class="kw-item">FIXING</span>
-                  <span data-hf-id="hf-ccc4" class="kw-item">SEARCH</span>
-                  <span data-hf-id="hf-b8hu" class="kw-item">WRITING</span>
-                  <span data-hf-id="hf-2hvs" class="kw-item">DESIGN</span>
-                  <span data-hf-id="hf-gfbn" class="kw-item">AGENTS</span>
-                  <!-- index 8: LEVEL again — loop illusion -->
+                  <span data-hf-id="hf-vaag" class="kw-item">REPORT</span>
+                  <span data-hf-id="hf-6aji" class="kw-item">DESIGN</span>
+                  <span data-hf-id="hf-ccc4" class="kw-item">VISION</span>
+                  <!-- index 5: LEVEL again — loop illusion -->
                   <span data-hf-id="hf-lvl1" class="kw-item">LEVEL</span>
                 </span>
               </span>
@@ -256,10 +253,10 @@
       onUpdate: applyTicker
     }, SCROLL_AT - 0.1);
 
-    /* Scroll from LEVEL(0) through 7 keywords and land on LEVEL(8) */
+    /* Scroll from LEVEL(0) through 4 keywords and land on LEVEL(5) */
     tl.to(scroll, {
-      pos: 8,
-      duration: 2.8,
+      pos: 5,
+      duration: 2.4,
       ease: "power2.inOut",
       onUpdate: applyTicker
     }, SCROLL_AT);
