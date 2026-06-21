@@ -103,20 +103,6 @@
       margin-left: 16px;
     }
 
-    /* Frosted glass pill behind the active slot */
-    #ticker-wrap::before {
-      content: "";
-      position: absolute;
-      inset: -6px -14px;
-      border-radius: 14px;
-      backdrop-filter: blur(18px) saturate(1.4);
-      -webkit-backdrop-filter: blur(18px) saturate(1.4);
-      background: rgba(255, 255, 255, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.80);
-      box-shadow: 0 2px 24px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255,255,255,0.9);
-      z-index: 0;
-    }
-
     #ticker {
       position: absolute;
       left: 0;
@@ -124,7 +110,6 @@
       width: 100%;
       height: 240px;
       overflow: hidden;
-      z-index: 1;
       -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 34%, #000 66%, transparent 100%);
       mask-image: linear-gradient(to bottom, transparent 0%, #000 34%, #000 66%, transparent 100%);
     }
@@ -151,6 +136,13 @@
       line-height: 1;
       white-space: nowrap;
       color: #f7bfa0;
+      /* glass-engraved texture: light highlight top, shadow bottom, inner depth */
+      text-shadow:
+        0 1px 0 rgba(255,255,255,0.60),
+        0 -1px 0 rgba(180,70,0,0.18),
+        0 2px 6px rgba(232,81,2,0.12),
+        0 0 24px rgba(232,81,2,0.08);
+      -webkit-text-stroke: 0.3px rgba(200,65,0,0.20);
     }
   </style>
 </head>
@@ -289,8 +281,8 @@
     const WAVE_WIDTH    = 160;   /* px — width of one sine lobe */
     const WAVE_INTERVAL = 1.4;   /* seconds between successive rings */
     const NUM_RINGS     = 4;     /* concurrent rings */
-    const BASE_ALPHA    = 0.13;  /* resting dot opacity */
-    const PEAK_ALPHA    = 0.30;  /* dot opacity at wave crest */
+    const BASE_ALPHA    = 0.10;  /* resting dot opacity */
+    const PEAK_ALPHA    = 0.28;  /* dot opacity at wave crest */
 
     function renderDots(tSec) {
       dctx.clearRect(0, 0, W, H);
@@ -318,7 +310,8 @@
           const alpha = BASE_ALPHA + (PEAK_ALPHA - BASE_ALPHA) * wave;
           dctx.beginPath();
           dctx.arc(x, y, DOT_R, 0, Math.PI * 2);
-          dctx.fillStyle = `rgba(0,0,0,${alpha.toFixed(3)})`;
+          /* orange tint: #e85102 = rgb(232,81,2) */
+          dctx.fillStyle = `rgba(232,81,2,${alpha.toFixed(3)})`;
           dctx.fill();
         }
       }
