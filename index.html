@@ -107,11 +107,12 @@
     }
 
     /* The masked window — 3 slots tall, centered on the phrase line.
-       Pulled up/left so the MIDDLE slot overlaps the typed text line. */
+       Pulled up so the MIDDLE slot's text baseline sits on the phrase
+       baseline (the +6px nudge aligns LEVEL with "Bring AI to next"). */
     #ticker {
       position: absolute;
       left: 0;
-      top: -80px;             /* center the middle slot on the line */
+      top: -74px;             /* -80 + 6px to drop LEVEL onto baseline */
       width: 100%;
       height: 240px;          /* 3 slots × 80px */
       overflow: hidden;
@@ -299,24 +300,41 @@
     const innerEl = document.getElementById("ticker-inner");
     const CENTER_OFFSET = ITEM_H; /* 80px — item0 (LEVEL) centered */
 
-    const scroll = { pos: 0 };
+    /* scroll.pos = item advanced; reveal = neighbor visibility (0→1).
+       At the start reveal=0 so ONLY the centered LEVEL is visible —
+       no faint keywords peeking before anything happens. */
+    const scroll = { pos: 0, reveal: 0 };
     function applyTicker() {
       const y = CENTER_OFFSET - scroll.pos * ITEM_H;
       innerEl.style.transform = `translateY(${y}px)`;
       const items = innerEl.children;
       for (let i = 0; i < items.length; i++) {
         const dist = Math.abs(i - scroll.pos);
-        let color;
-        if (dist < 0.4)      color = "#1d1d1f";  /* centered — black */
-        else if (dist < 1.2) color = "#9a9aa0";  /* adjacent — grey */
-        else                 color = "#c7c7cc";  /* far — faint */
-        items[i].style.color = color;
+        if (dist < 0.4) {
+          /* centered word — always fully black */
+          items[i].style.opacity = "1";
+          items[i].style.color = "#1d1d1f";
+        } else {
+          /* neighbors — faded by distance AND gated by reveal so they
+             stay invisible until the scroll begins */
+          items[i].style.opacity = String(scroll.reveal);
+          items[i].style.color = dist < 1.2 ? "#9a9aa0" : "#c7c7cc";
+        }
       }
     }
     applyTicker();
 
     /* Phase B — hide the cursor right when the scroll starts. */
     tl.set("#cursor", { opacity: 0, display: "none" }, SCROLL_AT);
+
+    /* Reveal the neighbor keywords just before the roll, so the
+       column "fills in" right as motion starts. */
+    tl.to(scroll, {
+      reveal: 1,
+      duration: 0.3,
+      ease: "power1.out",
+      onUpdate: applyTicker
+    }, SCROLL_AT - 0.1);
 
     /* Phase C — roll LEVEL(0) → index 7. power1.inOut for a smooth,
        continuous scroll with gentle ease in/out. */
