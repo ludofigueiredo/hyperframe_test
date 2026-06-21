@@ -15,7 +15,7 @@
 
     :root {
       --ink: #1d1d1f;
-      --accent: #0066cc;
+      --accent: #e85102;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -136,7 +136,7 @@
       letter-spacing: -0.03em;
       line-height: 1;
       white-space: nowrap;
-      color: #99c9f5;
+      color: #f7bfa0;
     }
   </style>
 </head>
@@ -323,10 +323,10 @@
         const dist = Math.abs(i - scroll.pos);
         if (dist < 0.4) {
           items[i].style.opacity = "1";
-          items[i].style.color = "#0066cc";
+          items[i].style.color = "#e85102";
         } else {
           items[i].style.opacity = String(scroll.reveal);
-          items[i].style.color = dist < 1.2 ? "#4d9fe8" : "#99c9f5";
+          items[i].style.color = dist < 1.2 ? "#f0844a" : "#f7bfa0";
         }
       }
     }
