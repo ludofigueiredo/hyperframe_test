@@ -56,18 +56,17 @@
       justify-content: center;
     }
 
-    /* Centered. During typing the full phrase is centered on its own;
-       when the ticker appears, GSAP shifts the line so the
-       phrase+ticker block stays optically centered (see script). */
+    /* Centered ONCE, for the whole life of the scene. The line holds
+       the fixed phrase + a fixed-width ticker slot (sized to the
+       widest keyword). Because the ticker width never changes, the
+       whole block's center is computed once and never moves —
+       no GSAP x-shifting. */
     #type-line {
       display: flex;
       align-items: baseline;
       justify-content: center;
     }
 
-    /* Relative box so the absolutely-placed ticker anchors at its
-       right edge. The phrase itself sizes this box and centers in
-       #type-line; the ticker overflows to the right out of flow. */
     #phrase-box {
       position: relative;
       display: inline-flex;
@@ -91,28 +90,20 @@
       height: 60px;
       background: var(--accent);
       margin-left: 6px;
-      vertical-align: bottom;
+      align-self: center;
+      flex: 0 0 auto;
       opacity: 1;
     }
 
-    /* Ticker — sits right where "level" was, replaces it.
-       Width fits the widest keyword tightly so the whole line
-       stays centered. A 3-slot window shows the centered keyword
-       plus faint neighbors above/below, vertically centered on the
-       phrase's text line. */
-    /* Absolutely positioned and OUT OF FLOW, so the typed phrase
-       always centers on its own during typing. Anchored just after
-       the phrase via left:100%. The centered word (LEVEL at first)
-       is part of the typed sentence; the scroll then rolls it into
-       the AI keywords — one continuous element. */
+    /* Ticker — IN FLOW with a FIXED width so the whole line centers
+       once and stays put. Width sized to the widest keyword
+       ("ANALYSIS"/"RESEARCH") so no word ever shifts the center. */
     #ticker-wrap {
-      position: absolute;
-      left: 100%;
-      bottom: 0;
-      width: 360px;           /* fits "ANALYSIS"/"RESEARCH" tightly */
+      position: relative;
+      display: inline-block;
+      width: 360px;           /* fixed — fits widest keyword */
       height: 80px;
       margin-left: 14px;      /* space after "next" */
-      opacity: 0;
     }
 
     /* The masked window — 3 slots tall, centered on the phrase line.
@@ -198,16 +189,16 @@
 </head>
 
 <body>
-  <div data-hf-id="hf-ph1f" id="root" data-composition-id="main" data-start="0" data-duration="6" data-width="1080" data-height="1080">
+  <div data-hf-id="hf-ph1f" id="root" data-composition-id="main" data-start="0" data-duration="8" data-width="1080" data-height="1080">
 
-    <!-- SCENE 1: Typewriter + keyword ticker (0–4s) -->
-    <div data-hf-id="hf-67e6" id="scene1" class="clip" data-start="0" data-duration="4" data-track-index="1" data-layout-allow-overlap="true">
+    <!-- SCENE 1: Typewriter + keyword ticker (0–6s) -->
+    <div data-hf-id="hf-67e6" id="scene1" class="clip" data-start="0" data-duration="6" data-track-index="1" data-layout-allow-overlap="true">
       <div data-hf-id="hf-knmf" id="scene1-inner">
         <div data-hf-id="hf-9jes" id="type-line">
-          <span data-hf-id="hf-49nd" id="phrase-box"><span data-hf-id="hf-0neq" id="type-text"></span><span data-hf-id="hf-42e8" id="cursor"></span><span data-hf-id="hf-w7si" id="ticker-wrap" data-layout-allow-overflow="true">
+          <span data-hf-id="hf-49nd" id="phrase-box"><span data-hf-id="hf-0neq" id="type-text"></span><span data-hf-id="hf-w7si" id="ticker-wrap" data-layout-allow-overflow="true">
             <span data-hf-id="hf-ayox" id="ticker" data-layout-allow-overflow="true">
               <span data-hf-id="hf-pgsv" id="ticker-inner">
-                <span data-hf-id="hf-lvl0" id="kw-level" class="kw-item">LEVEL</span>
+                <span data-hf-id="hf-lvl0" id="kw-level" class="kw-item"><span data-hf-id="hf-kyjs" id="level-text"></span><span data-hf-id="hf-42e8" id="cursor"></span></span>
                 <span data-hf-id="hf-vipr" class="kw-item">ANALYSIS</span>
                 <span data-hf-id="hf-vaag" class="kw-item">CODE</span>
                 <span data-hf-id="hf-6aji" class="kw-item">DOCS</span>
@@ -225,8 +216,8 @@
       </div>
     </div>
 
-    <!-- SCENE 2: Signature (4–6s) -->
-    <div data-hf-id="hf-z1je" id="scene2" class="clip" data-start="4" data-duration="2" data-track-index="2">
+    <!-- SCENE 2: Signature (6–8s) -->
+    <div data-hf-id="hf-z1je" id="scene2" class="clip" data-start="6" data-duration="2" data-track-index="2">
       <div data-hf-id="hf-hzkg" id="scene2-inner">
         <div data-hf-id="hf-mqrh" class="sig-mask" data-layout-allow-overflow="true"><div data-hf-id="hf-0h0z" id="sig-name">Ludovic Figueiredo</div></div>
         <div data-hf-id="hf-dfyp" class="sig-mask" data-layout-allow-overflow="true"><div data-hf-id="hf-5kxk" id="sig-title">Tech &amp; AI Addict</div></div>
@@ -248,45 +239,59 @@
          the AI keywords (ANALYSIS, CODE, DOCS, …) one by one.
        It's ONE continuous element: LEVEL is just the first item.
        ----------------------------------------------- */
+    /* Layout is centered ONCE by the fixed-width ticker (sized to the
+       widest keyword) — never shifted. The blue cursor types the fixed
+       phrase, then keeps typing LEVEL directly into the ticker's
+       centered slot. After LEVEL lands, hold 2s, then roll the ticker
+       through the AI keywords. */
     const PHRASE_FIXED = "Bring AI to next ";
+    const WORD_LEVEL   = "LEVEL";
     const TYPE_START   = 0.25;
-    const TYPE_DUR     = 1.0;
-    const LEVEL_AT     = 1.35;   /* LEVEL completes the sentence */
-    const SCROLL_AT    = 1.85;   /* keywords start rolling */
+    const PHRASE_DUR   = 0.95;                       /* type the phrase */
+    const LEVEL_START  = TYPE_START + PHRASE_DUR;    /* 1.2s */
+    const LEVEL_DUR    = 0.4;                         /* type LEVEL */
+    const LEVEL_AT     = LEVEL_START + LEVEL_DUR;     /* 1.6s done */
+    const HOLD         = 2.0;                         /* wait after LEVEL */
+    const SCROLL_AT    = LEVEL_AT + HOLD;             /* 3.6s scroll */
 
-    const typeEl   = document.getElementById("type-text");
-    const cursorEl = document.getElementById("cursor");
+    const typeEl    = document.getElementById("type-text");
+    const levelEl   = document.getElementById("level-text");
+    const cursorEl  = document.getElementById("cursor");
 
-    /* Phase A — type the fixed phrase only */
+    /* Phase A1 — type the fixed phrase into #type-text */
     const driver = { v: 0 };
     tl.to(driver, {
       v: PHRASE_FIXED.length,
-      duration: TYPE_DUR,
+      duration: PHRASE_DUR,
       ease: "none",
       onUpdate() {
         typeEl.textContent = PHRASE_FIXED.slice(0, Math.round(driver.v));
       }
     }, TYPE_START);
 
-    /* Cursor blink until LEVEL lands (sin driver, deterministic) */
+    /* Phase A2 — keep typing LEVEL into the ticker's centered slot */
+    const lvlDriver = { v: 0 };
+    tl.to(lvlDriver, {
+      v: WORD_LEVEL.length,
+      duration: LEVEL_DUR,
+      ease: "none",
+      onUpdate() {
+        levelEl.textContent = WORD_LEVEL.slice(0, Math.round(lvlDriver.v));
+      }
+    }, LEVEL_START);
+
+    /* Cursor blinks through typing AND the 2s hold (sin driver) */
     const blinkDriver = { p: 0 };
     tl.to(blinkDriver, {
-      p: Math.PI * 2 * 3,
-      duration: LEVEL_AT,
+      p: Math.PI * 2 * 8,
+      duration: SCROLL_AT,
       ease: "none",
       onUpdate() {
         cursorEl.style.opacity = Math.sin(blinkDriver.p) > 0 ? "1" : "0";
       }
     }, 0);
 
-    /* Phase B — LEVEL completes the sentence: reveal the ticker (with
-       LEVEL centered) and slide the line left so phrase + LEVEL reads
-       optically centered. Cursor hides — the sentence is complete. */
-    tl.set("#cursor", { opacity: 0, display: "none" }, LEVEL_AT);
-    tl.to("#ticker-wrap", { opacity: 1, duration: 0.28, ease: "power2.out" }, LEVEL_AT);
-    tl.to("#type-line", { x: -110, duration: 0.4, ease: "power2.inOut" }, LEVEL_AT);
-
-    /* Phase C — scroll the ticker upward.
+    /* Scroll mechanics.
        ITEM_H = 80px, window is 3 slots tall (240px); the MIDDLE slot
        (top offset 80px) is on the phrase line. item0 (LEVEL) sits in
        the middle slot at pos=0 → CENTER_OFFSET = 80. */
@@ -294,13 +299,10 @@
     const innerEl = document.getElementById("ticker-inner");
     const CENTER_OFFSET = ITEM_H; /* 80px — item0 (LEVEL) centered */
 
-    /* scroll.pos counts items advanced (0 = LEVEL centered) */
     const scroll = { pos: 0 };
     function applyTicker() {
       const y = CENTER_OFFSET - scroll.pos * ITEM_H;
       innerEl.style.transform = `translateY(${y}px)`;
-
-      /* color each item by distance from the centered slot */
       const items = innerEl.children;
       for (let i = 0; i < items.length; i++) {
         const dist = Math.abs(i - scroll.pos);
@@ -313,33 +315,36 @@
     }
     applyTicker();
 
-    /* Roll LEVEL(0) → index 7 across the dwell. power1.inOut gives a
-       smooth, continuous scroll with gentle ease in/out. */
+    /* Phase B — hide the cursor right when the scroll starts. */
+    tl.set("#cursor", { opacity: 0, display: "none" }, SCROLL_AT);
+
+    /* Phase C — roll LEVEL(0) → index 7. power1.inOut for a smooth,
+       continuous scroll with gentle ease in/out. */
     tl.to(scroll, {
       pos: 7,
-      duration: 1.75,
+      duration: 1.9,
       ease: "power1.inOut",
       onUpdate: applyTicker
     }, SCROLL_AT);
 
     /* Fade scene 1 out before signature */
-    tl.to("#scene1-inner", { opacity: 0, duration: 0.3, ease: "power1.in" }, 3.7);
-    tl.set("#scene1-inner", { opacity: 0 }, 4.0);
+    tl.to("#scene1-inner", { opacity: 0, duration: 0.3, ease: "power1.in" }, 5.7);
+    tl.set("#scene1-inner", { opacity: 0 }, 6.0);
 
     /* -----------------------------------------------
-       SCENE 2 — Signature mask-reveal
+       SCENE 2 — Signature mask-reveal (6–8s)
        ----------------------------------------------- */
-    tl.set("#scene2-inner", { opacity: 1 }, 4.0);
+    tl.set("#scene2-inner", { opacity: 1 }, 6.0);
 
-    tl.fromTo("#sig-name",  { y: 60 }, { y: 0, duration: 0.42, ease: "power3.out" }, 4.2);
-    tl.fromTo("#sig-title", { y: 38 }, { y: 0, duration: 0.38, ease: "power3.out" }, 4.55);
+    tl.fromTo("#sig-name",  { y: 60 }, { y: 0, duration: 0.42, ease: "power3.out" }, 6.2);
+    tl.fromTo("#sig-title", { y: 38 }, { y: 0, duration: 0.38, ease: "power3.out" }, 6.55);
 
-    tl.to("#scene2-inner", { opacity: 0, duration: 0.35, ease: "power1.in" }, 5.55);
+    tl.to("#scene2-inner", { opacity: 0, duration: 0.35, ease: "power1.in" }, 7.55);
 
     /* Hard kills */
-    tl.set("#scene2-inner", { opacity: 0 }, 6.0);
-    tl.set("#sig-name",  { y: 60 }, 6.0);
-    tl.set("#sig-title", { y: 38 }, 6.0);
+    tl.set("#scene2-inner", { opacity: 0 }, 8.0);
+    tl.set("#sig-name",  { y: 60 }, 8.0);
+    tl.set("#sig-title", { y: 38 }, 8.0);
 
     window.__timelines["main"] = tl;
   </script>
