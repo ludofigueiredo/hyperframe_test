@@ -101,9 +101,10 @@
     #ticker-wrap {
       position: relative;
       display: inline-block;
-      width: 360px;           /* fixed — fits widest keyword */
+      width: 320px;           /* fixed — fits widest keyword (WRITING) */
       height: 80px;
-      margin-left: 14px;      /* space after "next" */
+      margin-left: 16px;      /* one word-gap after "next" (space is
+                                 collapsed before an inline-block) */
     }
 
     /* The masked window — 3 slots tall, centered on the phrase line.
@@ -193,23 +194,23 @@
   <div data-hf-id="hf-ph1f" id="root" data-composition-id="main" data-start="0" data-duration="8" data-width="1080" data-height="1080">
 
     <!-- SCENE 1: Typewriter + keyword ticker (0–6s) -->
-    <div data-hf-id="hf-67e6" id="scene1" class="clip" data-start="0" data-duration="6" data-track-index="1" data-layout-allow-overlap="true">
+    <div data-hf-id="hf-67e6" id="scene1" class="clip" data-start="0" data-duration="6" data-track-index="0" data-layout-allow-overlap="true">
       <div data-hf-id="hf-knmf" id="scene1-inner">
         <div data-hf-id="hf-9jes" id="type-line">
           <span data-hf-id="hf-49nd" id="phrase-box"><span data-hf-id="hf-0neq" id="type-text"></span><span data-hf-id="hf-w7si" id="ticker-wrap" data-layout-allow-overflow="true">
             <span data-hf-id="hf-ayox" id="ticker" data-layout-allow-overflow="true">
               <span data-hf-id="hf-pgsv" id="ticker-inner">
                 <span data-hf-id="hf-lvl0" id="kw-level" class="kw-item"><span data-hf-id="hf-kyjs" id="level-text"></span><span data-hf-id="hf-42e8" id="cursor"></span></span>
-                <span data-hf-id="hf-vipr" class="kw-item">ANALYSIS</span>
-                <span data-hf-id="hf-vaag" class="kw-item">CODE</span>
-                <span data-hf-id="hf-6aji" class="kw-item">DOCS</span>
-                <span data-hf-id="hf-ccc4" class="kw-item">FIXING</span>
-                <span data-hf-id="hf-b8hu" class="kw-item">SEO</span>
-                <span data-hf-id="hf-2hvs" class="kw-item">RESEARCH</span>
-                <span data-hf-id="hf-gfbn" class="kw-item">WRITING</span>
-                <span data-hf-id="hf-3q0v" class="kw-item">ANALYSIS</span>
-                <span data-hf-id="hf-gncg" class="kw-item">CODE</span>
-                <span data-hf-id="hf-2a4i" class="kw-item">DOCS</span>
+                <span data-hf-id="hf-vipr" class="kw-item">CODE</span>
+                <span data-hf-id="hf-vaag" class="kw-item">DOCS</span>
+                <span data-hf-id="hf-6aji" class="kw-item">FIXING</span>
+                <span data-hf-id="hf-ccc4" class="kw-item">SEARCH</span>
+                <span data-hf-id="hf-b8hu" class="kw-item">WRITING</span>
+                <span data-hf-id="hf-2hvs" class="kw-item">DESIGN</span>
+                <span data-hf-id="hf-gfbn" class="kw-item">AGENTS</span>
+                <span data-hf-id="hf-3q0v" class="kw-item">CODE</span>
+                <span data-hf-id="hf-gncg" class="kw-item">DOCS</span>
+                <span data-hf-id="hf-2a4i" class="kw-item">FIXING</span>
               </span>
             </span>
           </span>
@@ -245,15 +246,15 @@
        phrase, then keeps typing LEVEL directly into the ticker's
        centered slot. After LEVEL lands, hold 2s, then roll the ticker
        through the AI keywords. */
-    const PHRASE_FIXED = "Bring AI to next ";
+    const PHRASE_FIXED = "Bring AI to next";  /* gap via ticker margin */
     const WORD_LEVEL   = "LEVEL";
     const TYPE_START   = 0.25;
     const PHRASE_DUR   = 0.95;                       /* type the phrase */
     const LEVEL_START  = TYPE_START + PHRASE_DUR;    /* 1.2s */
     const LEVEL_DUR    = 0.4;                         /* type LEVEL */
     const LEVEL_AT     = LEVEL_START + LEVEL_DUR;     /* 1.6s done */
-    const HOLD         = 2.0;                         /* wait after LEVEL */
-    const SCROLL_AT    = LEVEL_AT + HOLD;             /* 3.6s scroll */
+    const HOLD         = 1.0;                         /* wait after LEVEL */
+    const SCROLL_AT    = LEVEL_AT + HOLD;             /* 2.6s scroll */
 
     const typeEl    = document.getElementById("type-text");
     const levelEl   = document.getElementById("level-text");
