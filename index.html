@@ -14,40 +14,44 @@
     }
 
     :root {
-      --bg: #f5f5f7;
       --ink: #1d1d1f;
-      --muted: #6e6e73;
-      --faint: #c7c7cc;
       --accent: #0066cc;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html,
-    body {
+    html, body {
       width: 1080px;
       height: 1080px;
       overflow: hidden;
-      background: var(--bg);
-      font-family: "Inter", sans-serif;
+      background: #eef4fb;
     }
 
     #root {
       position: relative;
       width: 1080px;
       height: 1080px;
-      background: var(--bg);
       overflow: hidden;
     }
 
-    #scene1 {
+    /* Iridescent background layers */
+    #bg-canvas {
       position: absolute;
       inset: 0;
+      width: 1080px;
+      height: 1080px;
     }
+
+    #bg-dots {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1080px;
+      opacity: 0.18;
+    }
+
+    /* Scene */
+    #scene1 { position: absolute; inset: 0; }
 
     #scene1-inner {
       position: absolute;
@@ -138,27 +142,33 @@
 </head>
 
 <body>
-  <div data-hf-id="hf-ph1f" id="root" data-composition-id="main" data-start="0" data-duration="6" data-width="1080"
-    data-height="1080">
+  <div data-hf-id="hf-ph1f" id="root" data-composition-id="main" data-start="0" data-duration="6" data-width="1080" data-height="1080">
+
+    <!-- Iridescent background canvas -->
+    <canvas data-hf-id="hf-eo1d" id="bg-canvas" width="1080" height="1080"></canvas>
+
+    <!-- Dot-grid overlay (SVG pattern, matches ref texture) -->
+    <svg data-hf-id="hf-uxzk" id="bg-dots" xmlns="http://www.w3.org/2000/svg">
+      <defs data-hf-id="hf-mh0t">
+        <pattern data-hf-id="hf-h32h" id="dot-grid" x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse">
+          <circle data-hf-id="hf-305w" cx="6" cy="6" r="1" fill="#5ba8d8" />
+        </pattern>
+      </defs>
+      <rect data-hf-id="hf-26tq" width="1080" height="1080" fill="url(#dot-grid)" />
+    </svg>
 
     <!-- SCENE 1: Typewriter + keyword ticker (0–6s) -->
-    <div data-hf-id="hf-67e6" id="scene1" class="clip" data-start="0" data-duration="6" data-track-index="0"
-      data-layout-allow-overlap="true">
+    <div data-hf-id="hf-67e6" id="scene1" class="clip" data-start="0" data-duration="6" data-track-index="0" data-layout-allow-overlap="true">
       <div data-hf-id="hf-knmf" id="scene1-inner">
         <div data-hf-id="hf-9jes" id="type-line">
-          <span data-hf-id="hf-49nd" id="phrase-box"><span data-hf-id="hf-0neq" id="type-text"></span><span
-              data-hf-id="hf-w7si" id="ticker-wrap" data-layout-allow-overflow="true">
+          <span data-hf-id="hf-49nd" id="phrase-box"><span data-hf-id="hf-0neq" id="type-text"></span><span data-hf-id="hf-w7si" id="ticker-wrap" data-layout-allow-overflow="true">
               <span data-hf-id="hf-ayox" id="ticker" data-layout-allow-overflow="true">
                 <span data-hf-id="hf-pgsv" id="ticker-inner">
-                  <!-- index 0: LEVEL (typed by cursor) -->
-                  <span data-hf-id="hf-lvl0" id="kw-level" class="kw-item"><span data-hf-id="hf-kyjs"
-                      id="level-text"></span><span data-hf-id="hf-42e8" id="cursor"></span></span>
-                  <!-- indices 1–4: keywords -->
+                  <span data-hf-id="hf-lvl0" id="kw-level" class="kw-item"><span data-hf-id="hf-kyjs" id="level-text"></span><span data-hf-id="hf-42e8" id="cursor"></span></span>
                   <span data-hf-id="hf-vipr" class="kw-item">CODE</span>
                   <span data-hf-id="hf-vaag" class="kw-item">REPORT</span>
                   <span data-hf-id="hf-6aji" class="kw-item">DESIGN</span>
                   <span data-hf-id="hf-ccc4" class="kw-item">VISION</span>
-                  <!-- index 5: LEVEL again — loop illusion -->
                   <span data-hf-id="hf-lvl1" class="kw-item">LEVEL</span>
                 </span>
               </span>
@@ -171,57 +181,113 @@
   </div>
 
   <script>
+    /* -----------------------------------------------
+       IRIDESCENT BACKGROUND
+       Canvas 2D — deterministic, driven by GSAP time.
+       Three soft gaussian blobs of very desaturated
+       blue/cyan/lavender float slowly across the canvas,
+       blending into a near-white base. A fourth bright
+       specular "sweep" moves across once.
+    ----------------------------------------------- */
+    const bgCanvas = document.getElementById("bg-canvas");
+    const ctx = bgCanvas.getContext("2d");
+    const W = 1080, H = 1080;
+
+    function renderBg(t) {
+      ctx.clearRect(0, 0, W, H);
+
+      /* Base: very light cool white */
+      ctx.fillStyle = "#eef4fb";
+      ctx.fillRect(0, 0, W, H);
+
+      /* Blob definitions — positions oscillate with sin/cos of t.
+         Colors: super-desaturated blue, cyan, lavender. */
+      const blobs = [
+        /* [cx_base, cy_base, cx_amp, cy_amp, cx_freq, cy_freq, r, color] */
+        [0.25, 0.30, 0.12, 0.08, 0.38, 0.51, 560, "rgba(180,210,240,0.55)"],
+        [0.72, 0.60, 0.10, 0.14, 0.47, 0.33, 520, "rgba(195,225,245,0.45)"],
+        [0.45, 0.75, 0.15, 0.10, 0.29, 0.42, 480, "rgba(210,220,250,0.40)"],
+        [0.60, 0.20, 0.08, 0.12, 0.55, 0.37, 440, "rgba(170,215,235,0.38)"],
+      ];
+
+      for (const [bx, by, ax, ay, fx, fy, r, color] of blobs) {
+        const cx = (bx + ax * Math.sin(t * fx * Math.PI * 2)) * W;
+        const cy = (by + ay * Math.cos(t * fy * Math.PI * 2)) * H;
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        grad.addColorStop(0, color);
+        grad.addColorStop(1, "rgba(238,244,251,0)");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      /* Specular sweep — a bright diagonal band that crosses once over 6s */
+      const sweepX = (-200 + (W + 400) * t);
+      const sg = ctx.createLinearGradient(sweepX - 200, 0, sweepX + 200, H);
+      sg.addColorStop(0,    "rgba(255,255,255,0)");
+      sg.addColorStop(0.45, "rgba(255,255,255,0.22)");
+      sg.addColorStop(0.5,  "rgba(255,255,255,0.32)");
+      sg.addColorStop(0.55, "rgba(255,255,255,0.22)");
+      sg.addColorStop(1,    "rgba(255,255,255,0)");
+      ctx.fillStyle = sg;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    /* Initial paint */
+    renderBg(0);
+
+    /* -----------------------------------------------
+       MAIN TIMELINE
+    ----------------------------------------------- */
     window.__timelines = window.__timelines || {};
     const tl = gsap.timeline({ paused: true });
 
-    const PHRASE_FIXED = "Bring AI to next";
-    const WORD_LEVEL = "LEVEL";
-    const TYPE_START = 0.25;
-    const PHRASE_DUR = 0.95;
-    const LEVEL_START = TYPE_START + PHRASE_DUR;   /* 1.2s */
-    const LEVEL_DUR = 0.4;
-    const LEVEL_AT = LEVEL_START + LEVEL_DUR;      /* 1.6s */
-    const HOLD = 0.7;
-    const SCROLL_AT = LEVEL_AT + HOLD;             /* 2.6s */
+    /* Drive background from timeline time */
+    const bgDriver = { t: 0 };
+    tl.to(bgDriver, {
+      t: 1,
+      duration: 6,
+      ease: "none",
+      onUpdate() { renderBg(bgDriver.t); }
+    }, 0);
 
-    const typeEl = document.getElementById("type-text");
-    const levelEl = document.getElementById("level-text");
+    const PHRASE_FIXED = "Bring AI to next";
+    const WORD_LEVEL   = "LEVEL";
+    const TYPE_START   = 0.25;
+    const PHRASE_DUR   = 0.95;
+    const LEVEL_START  = TYPE_START + PHRASE_DUR;
+    const LEVEL_DUR    = 0.4;
+    const LEVEL_AT     = LEVEL_START + LEVEL_DUR;
+    const HOLD         = 0.7;
+    const SCROLL_AT    = LEVEL_AT + HOLD;
+
+    const typeEl   = document.getElementById("type-text");
+    const levelEl  = document.getElementById("level-text");
     const cursorEl = document.getElementById("cursor");
 
-    /* Type the fixed phrase */
     const driver = { v: 0 };
     tl.to(driver, {
       v: PHRASE_FIXED.length,
       duration: PHRASE_DUR,
       ease: "none",
-      onUpdate() {
-        typeEl.textContent = PHRASE_FIXED.slice(0, Math.round(driver.v));
-      }
+      onUpdate() { typeEl.textContent = PHRASE_FIXED.slice(0, Math.round(driver.v)); }
     }, TYPE_START);
 
-    /* Type LEVEL into the ticker slot */
     const lvlDriver = { v: 0 };
     tl.to(lvlDriver, {
       v: WORD_LEVEL.length,
       duration: LEVEL_DUR,
       ease: "none",
-      onUpdate() {
-        levelEl.textContent = WORD_LEVEL.slice(0, Math.round(lvlDriver.v));
-      }
+      onUpdate() { levelEl.textContent = WORD_LEVEL.slice(0, Math.round(lvlDriver.v)); }
     }, LEVEL_START);
 
-    /* Cursor blink via sin driver */
     const blinkDriver = { p: 0 };
     tl.to(blinkDriver, {
       p: Math.PI * 2 * 8,
       duration: SCROLL_AT,
       ease: "none",
-      onUpdate() {
-        cursorEl.style.opacity = Math.sin(blinkDriver.p) > 0 ? "1" : "0";
-      }
+      onUpdate() { cursorEl.style.opacity = Math.sin(blinkDriver.p) > 0 ? "1" : "0"; }
     }, 0);
 
-    /* Ticker scroll — ends at index 8 (duplicate LEVEL) for loop illusion */
     const ITEM_H = 80;
     const innerEl = document.getElementById("ticker-inner");
     const CENTER_OFFSET = ITEM_H;
@@ -253,7 +319,6 @@
       onUpdate: applyTicker
     }, SCROLL_AT - 0.1);
 
-    /* Scroll from LEVEL(0) through 4 keywords and land on LEVEL(5) */
     tl.to(scroll, {
       pos: 5,
       duration: 2.4,
