@@ -102,13 +102,14 @@
        phrase's text line. */
     /* Absolutely positioned and OUT OF FLOW, so the typed phrase
        always centers on its own during typing. Anchored just after
-       the phrase via left:100% on the type-text. At reveal, GSAP
-       shifts the whole line left so phrase+keyword reads centered. */
+       the phrase via left:100%. The centered word (LEVEL at first)
+       is part of the typed sentence; the scroll then rolls it into
+       the AI keywords — one continuous element. */
     #ticker-wrap {
       position: absolute;
       left: 100%;
       bottom: 0;
-      width: 300px;           /* fits "Analysis" (widest) tightly */
+      width: 360px;           /* fits "ANALYSIS"/"RESEARCH" tightly */
       height: 80px;
       margin-left: 14px;      /* space after "next" */
       opacity: 0;
@@ -206,16 +207,17 @@
           <span data-hf-id="hf-49nd" id="phrase-box"><span data-hf-id="hf-0neq" id="type-text"></span><span data-hf-id="hf-42e8" id="cursor"></span><span data-hf-id="hf-w7si" id="ticker-wrap" data-layout-allow-overflow="true">
             <span data-hf-id="hf-ayox" id="ticker" data-layout-allow-overflow="true">
               <span data-hf-id="hf-pgsv" id="ticker-inner">
-                <span data-hf-id="hf-vipr" class="kw-item">Analysis</span>
-                <span data-hf-id="hf-vaag" class="kw-item">Code</span>
-                <span data-hf-id="hf-6aji" class="kw-item">Docs</span>
-                <span data-hf-id="hf-ccc4" class="kw-item">Fixing</span>
+                <span data-hf-id="hf-lvl0" id="kw-level" class="kw-item">LEVEL</span>
+                <span data-hf-id="hf-vipr" class="kw-item">ANALYSIS</span>
+                <span data-hf-id="hf-vaag" class="kw-item">CODE</span>
+                <span data-hf-id="hf-6aji" class="kw-item">DOCS</span>
+                <span data-hf-id="hf-ccc4" class="kw-item">FIXING</span>
                 <span data-hf-id="hf-b8hu" class="kw-item">SEO</span>
-                <span data-hf-id="hf-2hvs" class="kw-item">Research</span>
-                <span data-hf-id="hf-gfbn" class="kw-item">Writing</span>
-                <span data-hf-id="hf-3q0v" class="kw-item">Analysis</span>
-                <span data-hf-id="hf-gncg" class="kw-item">Code</span>
-                <span data-hf-id="hf-2a4i" class="kw-item">Docs</span>
+                <span data-hf-id="hf-2hvs" class="kw-item">RESEARCH</span>
+                <span data-hf-id="hf-gfbn" class="kw-item">WRITING</span>
+                <span data-hf-id="hf-3q0v" class="kw-item">ANALYSIS</span>
+                <span data-hf-id="hf-gncg" class="kw-item">CODE</span>
+                <span data-hf-id="hf-2a4i" class="kw-item">DOCS</span>
               </span>
             </span>
           </span>
@@ -238,67 +240,61 @@
     const tl = gsap.timeline({ paused: true });
 
     /* -----------------------------------------------
-       SCENE 1 — Typewriter then keyword ticker
-       Phase A (0–1.5s): type "Bring AI to next level"
-       Phase B (~1.5s):  swap "level" → scrolling ticker
-       Phase C (1.5–3.6s): ticker scrolls upward, the
-         centered keyword is black, neighbors faded by
-         distance. Mask dissolves top/bottom.
+       SCENE 1 — Typewriter that rolls into a keyword ticker
+       Phase A (0–~1.3s): type "Bring AI to next " — cursor blinks.
+       Phase B (~1.3s): "LEVEL" appears as the centered ticker word,
+         completing the sentence "Bring AI to next LEVEL".
+       Phase C (~1.7–3.6s): the ticker scrolls — LEVEL rolls up into
+         the AI keywords (ANALYSIS, CODE, DOCS, …) one by one.
+       It's ONE continuous element: LEVEL is just the first item.
        ----------------------------------------------- */
-    const PHRASE_FIXED = "Bring AI to next ";  /* stays */
-    const WORD_LEVEL   = "level";              /* typed then replaced */
-    const FULL_TEXT    = PHRASE_FIXED + WORD_LEVEL;
+    const PHRASE_FIXED = "Bring AI to next ";
     const TYPE_START   = 0.25;
-    const TYPE_DUR     = 1.1;
+    const TYPE_DUR     = 1.0;
+    const LEVEL_AT     = 1.35;   /* LEVEL completes the sentence */
+    const SCROLL_AT    = 1.85;   /* keywords start rolling */
 
     const typeEl   = document.getElementById("type-text");
     const cursorEl = document.getElementById("cursor");
 
-    /* Phase A — typewriter types the whole phrase incl. "level" */
+    /* Phase A — type the fixed phrase only */
     const driver = { v: 0 };
     tl.to(driver, {
-      v: FULL_TEXT.length,
+      v: PHRASE_FIXED.length,
       duration: TYPE_DUR,
       ease: "none",
       onUpdate() {
-        typeEl.textContent = FULL_TEXT.slice(0, Math.round(driver.v));
+        typeEl.textContent = PHRASE_FIXED.slice(0, Math.round(driver.v));
       }
     }, TYPE_START);
 
-    /* Cursor blink while typing (sin driver, deterministic) */
+    /* Cursor blink until LEVEL lands (sin driver, deterministic) */
     const blinkDriver = { p: 0 };
     tl.to(blinkDriver, {
       p: Math.PI * 2 * 3,
-      duration: 1.5,
+      duration: LEVEL_AT,
       ease: "none",
       onUpdate() {
         cursorEl.style.opacity = Math.sin(blinkDriver.p) > 0 ? "1" : "0";
       }
     }, 0);
 
-    /* Phase B — at 1.5s, strip "level" from the typed text, hide
-       cursor, reveal the ticker, and slide the line left so the
-       phrase + centered keyword reads optically centered.
-       Shift ≈ half the visible keyword extent (margin + ~width/2). */
-    tl.call(() => {
-      typeEl.textContent = PHRASE_FIXED;
-    }, [], 1.5);
-    tl.set("#cursor", { opacity: 0, display: "none" }, 1.5);
-    tl.to("#ticker-wrap", { opacity: 1, duration: 0.3, ease: "power2.out" }, 1.5);
-    tl.to("#type-line", { x: -95, duration: 0.4, ease: "power2.inOut" }, 1.5);
+    /* Phase B — LEVEL completes the sentence: reveal the ticker (with
+       LEVEL centered) and slide the line left so phrase + LEVEL reads
+       optically centered. Cursor hides — the sentence is complete. */
+    tl.set("#cursor", { opacity: 0, display: "none" }, LEVEL_AT);
+    tl.to("#ticker-wrap", { opacity: 1, duration: 0.28, ease: "power2.out" }, LEVEL_AT);
+    tl.to("#type-line", { x: -110, duration: 0.4, ease: "power2.inOut" }, LEVEL_AT);
 
     /* Phase C — scroll the ticker upward.
        ITEM_H = 80px, window is 3 slots tall (240px); the MIDDLE slot
-       (top offset 80px) is on the phrase line. For pos=0 we place
-       item0 in the middle slot → CENTER_OFFSET = 80. Neighbors fill
-       the slots above/below and dissolve via the gradient mask. */
+       (top offset 80px) is on the phrase line. item0 (LEVEL) sits in
+       the middle slot at pos=0 → CENTER_OFFSET = 80. */
     const ITEM_H = 80;
     const innerEl = document.getElementById("ticker-inner");
+    const CENTER_OFFSET = ITEM_H; /* 80px — item0 (LEVEL) centered */
 
-    /* item0 sits in the middle slot (one slot down from the top). */
-    const CENTER_OFFSET = ITEM_H; /* 80px */
-
-    /* scrollPos counts keywords advanced (0 = "Analysis" centered) */
+    /* scroll.pos counts items advanced (0 = LEVEL centered) */
     const scroll = { pos: 0 };
     function applyTicker() {
       const y = CENTER_OFFSET - scroll.pos * ITEM_H;
@@ -317,15 +313,14 @@
     }
     applyTicker();
 
-    /* Roll from index 0 → 6 across the dwell (1.6s → 3.6s).
-       power1.inOut over the whole run gives a smooth, continuous
-       scroll with gentle ease at start/end (like the reference). */
+    /* Roll LEVEL(0) → index 7 across the dwell. power1.inOut gives a
+       smooth, continuous scroll with gentle ease in/out. */
     tl.to(scroll, {
-      pos: 6,
-      duration: 2.0,
+      pos: 7,
+      duration: 1.75,
       ease: "power1.inOut",
       onUpdate: applyTicker
-    }, 1.6);
+    }, SCROLL_AT);
 
     /* Fade scene 1 out before signature */
     tl.to("#scene1-inner", { opacity: 0, duration: 0.3, ease: "power1.in" }, 3.7);
