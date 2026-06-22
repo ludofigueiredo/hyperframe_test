@@ -124,6 +124,7 @@
       top: 0;
       /* hidden until the phrase slides left to make room */
       opacity: 0;
+      will-change: transform, opacity;
     }
 
     #ticker {
@@ -197,6 +198,9 @@
                   <span data-hf-id="hf-6aji" class="kw-item">SUPPORT</span>
                   <span data-hf-id="hf-ccc4" class="kw-item">TEAM</span>
                   <span data-hf-id="hf-b8hu" class="kw-item">DATA</span>
+                  <span data-hf-id="hf-sales" class="kw-item">SALES</span>
+                  <span data-hf-id="hf-hiring" class="kw-item">HIRING</span>
+                  <span data-hf-id="hf-cloud" class="kw-item">CLOUD</span>
                   <span data-hf-id="hf-lvl1" class="kw-item">FINANCE</span>
                 </span>
               </span>
@@ -434,7 +438,12 @@
     const TICKER_WIDTH = 340;
     const TICKER_MARGIN = 16;
     const COMBINED_WIDTH = TICKER_WIDTH + TICKER_MARGIN;
-    const SLIDE_DUR = 0.45;
+    const SLIDE_DUR = 0.35;
+
+    /* Initialize ticker-wrap position from left */
+    const SCROLL_START_OFFSET = -35;
+    document.getElementById("ticker-wrap").style.transform = `translateX(${SCROLL_START_OFFSET}px)`;
+    gsap.set("#ticker-wrap", { x: SCROLL_START_OFFSET, opacity: 0 });
 
     tl.to("#type-line", {
       x: -(COMBINED_WIDTH / 2),
@@ -446,17 +455,18 @@
         const slideEnd = (LEVEL_AT + 0.15 + SLIDE_DUR) / 6;
         const slideProgress = (progress - slideStart) / (slideEnd - slideStart);
         if (slideProgress >= 0 && slideProgress <= 1) {
-          const blurAmount = Math.max(0, (1 - slideProgress) * 1.2);
+          const blurAmount = Math.max(0, (1 - slideProgress) * 3);
           document.getElementById("phrase-box").style.filter = `blur(${blurAmount}px)`;
         }
       }
     }, LEVEL_AT + 0.15);
 
     tl.to("#ticker-wrap", {
+      x: 0,
       opacity: 1,
       duration: SLIDE_DUR,
       ease: "back.out(1.2)"
-    }, LEVEL_AT + 0.15);
+    }, LEVEL_AT + SLIDE_DUR);
 
     tl.to("#cursor", { opacity: 0, duration: 0.2, ease: "none" }, LEVEL_AT + 0.1);
 
@@ -468,9 +478,9 @@
     }, SCROLL_AT - 0.1);
 
     tl.to(scroll, {
-      pos: 6,
+      pos: 9,
       duration: 2.6,
-      ease: "power2.inOut",
+      ease: "sine.inOut",
       onUpdate: applyTicker
     }, SCROLL_AT);
 
