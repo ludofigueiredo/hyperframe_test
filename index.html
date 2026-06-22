@@ -83,6 +83,14 @@
       display: inline-flex;
       align-items: baseline;
       white-space: nowrap;
+      will-change: filter;
+    }
+
+    #phrase-box {
+      position: relative;
+      display: inline-flex;
+      align-items: baseline;
+      white-space: nowrap;
     }
 
     #type-text {
@@ -289,7 +297,7 @@
     const dotCanvas = document.getElementById("bg-dots");
     const dctx = dotCanvas.getContext("2d");
     const GRID = 12;   /* spacing between dots */
-    const DOT_R = 1.0;  /* dot radius px */
+    const DOT_R = 1.8;  /* dot radius px */
     const COLS = Math.ceil(W / GRID);
     const ROWS = Math.ceil(H / GRID);
     const CX = W / 2;
@@ -300,7 +308,7 @@
     /* Wave params */
     const WAVE_SPEED = 220;   /* px per second the ring travels */
     const WAVE_WIDTH = 160;   /* px — width of one sine lobe */
-    const WAVE_INTERVAL = 1.4;   /* seconds between successive rings */
+    const WAVE_INTERVAL = 2.5;   /* seconds between successive rings */
     const NUM_RINGS = 4;     /* concurrent rings */
     const BASE_ALPHA = 0.10;  /* resting dot opacity */
     const PEAK_ALPHA = 0.28;  /* dot opacity at wave crest */
@@ -431,13 +439,23 @@
     tl.to("#type-line", {
       x: -(COMBINED_WIDTH / 2),
       duration: SLIDE_DUR,
-      ease: "power2.inOut"
+      ease: "back.out(1.2)",
+      onUpdate() {
+        const progress = tl.progress();
+        const slideStart = (LEVEL_AT + 0.15) / 6;
+        const slideEnd = (LEVEL_AT + 0.15 + SLIDE_DUR) / 6;
+        const slideProgress = (progress - slideStart) / (slideEnd - slideStart);
+        if (slideProgress >= 0 && slideProgress <= 1) {
+          const blurAmount = Math.max(0, (1 - slideProgress) * 1.2);
+          document.getElementById("phrase-box").style.filter = `blur(${blurAmount}px)`;
+        }
+      }
     }, LEVEL_AT + 0.15);
 
     tl.to("#ticker-wrap", {
       opacity: 1,
       duration: SLIDE_DUR,
-      ease: "power2.inOut"
+      ease: "back.out(1.2)"
     }, LEVEL_AT + 0.15);
 
     tl.to("#cursor", { opacity: 0, duration: 0.2, ease: "none" }, LEVEL_AT + 0.1);
