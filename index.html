@@ -72,7 +72,9 @@
       display: flex;
       align-items: baseline;
       justify-content: center;
-      /* Will be translated left during the reveal animation */
+      /* During initial phrase reveal, this keeps content centered.
+         Once ticker-wrap appears, x translation shifts the whole line left
+         so the phrase+ticker block ends up centered as a unit. */
       will-change: transform;
     }
 
@@ -106,11 +108,12 @@
     }
 
     #ticker-wrap {
-      position: relative;
+      position: absolute;
       display: inline-block;
       width: 340px;
       height: 80px;
-      margin-left: 16px;
+      left: calc(100% + 16px);
+      top: 0;
       /* hidden until the phrase slides left to make room */
       opacity: 0;
     }
@@ -118,7 +121,7 @@
     #ticker {
       position: absolute;
       left: 0;
-      top: -70px;
+      top: -90px;
       width: 100%;
       height: 240px;
       overflow: hidden;
@@ -185,7 +188,7 @@
                   <span data-hf-id="hf-vaag" class="kw-item">PRODUCT</span>
                   <span data-hf-id="hf-6aji" class="kw-item">SUPPORT</span>
                   <span data-hf-id="hf-ccc4" class="kw-item">TEAM</span>
-                  <span data-hf-id="hf-b8hu" class="kw-item">CODING</span>
+                  <span data-hf-id="hf-b8hu" class="kw-item">DATA</span>
                   <span data-hf-id="hf-lvl1" class="kw-item">FINANCE</span>
                 </span>
               </span>
@@ -416,14 +419,17 @@
     }
     applyTicker();
 
-    /* Slide phrase left + reveal ticker so the full block stays centered.
-       ticker-wrap = 340px wide + 16px margin-left = 356px total extra.
-       Shift #type-line by -(356/2) = -178px so the combined block centers. */
-    const TICKER_TOTAL = (340 + 16) / 2;   /* 178px */
+    /* Position ticker-wrap absolutely so it doesn't affect flex centering of the phrase.
+       Initially hidden (opacity 0), positioned left of center.
+       When it appears, shift both phrase (#type-line) and ticker together so the combined
+       block stays centered within #scene1-inner. */
+    const TICKER_WIDTH = 340;
+    const TICKER_MARGIN = 16;
+    const COMBINED_WIDTH = TICKER_WIDTH + TICKER_MARGIN;
     const SLIDE_DUR = 0.45;
 
     tl.to("#type-line", {
-      x: -TICKER_TOTAL,
+      x: -(COMBINED_WIDTH / 2),
       duration: SLIDE_DUR,
       ease: "power2.inOut"
     }, LEVEL_AT + 0.15);
