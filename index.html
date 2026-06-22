@@ -18,9 +18,14 @@
       --accent: #e85102;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    html, body {
+    html,
+    body {
       width: 1080px;
       height: 1080px;
       overflow: hidden;
@@ -50,7 +55,10 @@
     }
 
     /* Scene */
-    #scene1 { position: absolute; inset: 0; }
+    #scene1 {
+      position: absolute;
+      inset: 0;
+    }
 
     #scene1-inner {
       position: absolute;
@@ -64,6 +72,8 @@
       display: flex;
       align-items: baseline;
       justify-content: center;
+      /* Will be translated left during the reveal animation */
+      will-change: transform;
     }
 
     #phrase-box {
@@ -98,9 +108,11 @@
     #ticker-wrap {
       position: relative;
       display: inline-block;
-      width: 340px;  /* fits PRODUCT/SUPPORT/FINANCE at 64px */
+      width: 340px;
       height: 80px;
       margin-left: 16px;
+      /* hidden until the phrase slides left to make room */
+      opacity: 0;
     }
 
     #ticker {
@@ -138,17 +150,18 @@
       color: #f7bfa0;
       /* glass-engraved texture: light highlight top, shadow bottom, inner depth */
       text-shadow:
-        0 1px 0 rgba(255,255,255,0.60),
-        0 -1px 0 rgba(180,70,0,0.18),
-        0 2px 6px rgba(232,81,2,0.12),
-        0 0 24px rgba(232,81,2,0.08);
-      -webkit-text-stroke: 0.3px rgba(200,65,0,0.20);
+        0 1px 0 rgba(255, 255, 255, 0.60),
+        0 -1px 0 rgba(180, 70, 0, 0.18),
+        0 2px 6px rgba(232, 81, 2, 0.12),
+        0 0 24px rgba(232, 81, 2, 0.08);
+      -webkit-text-stroke: 0.3px rgba(200, 65, 0, 0.20);
     }
   </style>
 </head>
 
 <body>
-  <div data-hf-id="hf-ph1f" id="root" data-composition-id="main" data-start="0" data-duration="6" data-width="1080" data-height="1080">
+  <div data-hf-id="hf-ph1f" id="root" data-composition-id="main" data-start="0" data-duration="6" data-width="1080"
+    data-height="1080">
 
     <!-- Iridescent background canvas -->
     <canvas data-hf-id="hf-eo1d" id="bg-canvas" width="1080" height="1080"></canvas>
@@ -157,13 +170,17 @@
     <canvas data-hf-id="hf-lhbl" id="bg-dots" width="1080" height="1080"></canvas>
 
     <!-- SCENE 1: Typewriter + keyword ticker (0–6s) -->
-    <div data-hf-id="hf-67e6" id="scene1" class="clip" data-start="0" data-duration="6" data-track-index="0" data-layout-allow-overlap="true">
+    <div data-hf-id="hf-67e6" id="scene1" class="clip" data-start="0" data-duration="6" data-track-index="0"
+      data-layout-allow-overlap="true">
       <div data-hf-id="hf-knmf" id="scene1-inner">
         <div data-hf-id="hf-9jes" id="type-line">
-          <span data-hf-id="hf-49nd" id="phrase-box"><span data-hf-id="hf-0neq" id="type-text"></span><span data-hf-id="hf-w7si" id="ticker-wrap" data-layout-allow-overflow="true">
+          <span data-hf-id="hf-49nd" id="phrase-box"><span data-hf-id="hf-0neq" id="type-text"></span><span
+              data-hf-id="hf-42e8" id="cursor"></span><span data-hf-id="hf-w7si" id="ticker-wrap"
+              data-layout-allow-overflow="true">
               <span data-hf-id="hf-ayox" id="ticker" data-layout-allow-overflow="true">
                 <span data-hf-id="hf-pgsv" id="ticker-inner">
-                  <span data-hf-id="hf-lvl0" id="kw-level" class="kw-item"><span data-hf-id="hf-kyjs" id="level-text"></span><span data-hf-id="hf-42e8" id="cursor"></span></span>
+                  <span data-hf-id="hf-lvl0" id="kw-level" class="kw-item"><span data-hf-id="hf-kyjs"
+                      id="level-text"></span></span>
                   <span data-hf-id="hf-vipr" class="kw-item">DESIGN</span>
                   <span data-hf-id="hf-vaag" class="kw-item">PRODUCT</span>
                   <span data-hf-id="hf-6aji" class="kw-item">SUPPORT</span>
@@ -206,9 +223,9 @@
       ctx.rotate(angle);
       ctx.scale(rx / ry, 1);
       const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, ry);
-      grad.addColorStop(0,   colorInner);
+      grad.addColorStop(0, colorInner);
       grad.addColorStop(0.5, colorInner.replace(/[\d.]+\)$/, "0.3)"));
-      grad.addColorStop(1,   colorOuter);
+      grad.addColorStop(1, colorOuter);
       ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.arc(0, 0, ry, 0, Math.PI * 2);
@@ -228,24 +245,24 @@
       /* Black blobs — very low opacity so they stay subtle */
       const blobs = [
         /* [bx, by, ax, ay, fx, fy, rx, ry, ang_base, ang_amp, ang_freq, alpha] */
-        [0.15, 0.20, 0.25, 0.20, 0.31, 0.27, 680, 420, 0.4,  0.3, 0.19, 0.07],
+        [0.15, 0.20, 0.25, 0.20, 0.31, 0.27, 680, 420, 0.4, 0.3, 0.19, 0.07],
         [0.80, 0.75, 0.15, 0.18, 0.41, 0.37, 620, 380, -0.5, 0.4, 0.23, 0.06],
-        [0.50, 0.55, 0.35, 0.15, 0.22, 0.48, 550, 340, 0.2,  0.5, 0.16, 0.05],
-        [0.88, 0.12, 0.10, 0.14, 0.34, 0.29, 480, 300, 0.8,  0.3, 0.21, 0.05],
+        [0.50, 0.55, 0.35, 0.15, 0.22, 0.48, 550, 340, 0.2, 0.5, 0.16, 0.05],
+        [0.88, 0.12, 0.10, 0.14, 0.34, 0.29, 480, 300, 0.8, 0.3, 0.21, 0.05],
       ];
 
       for (const [bx, by, ax, ay, fx, fy, rx, ry, ab, aa, af, alpha] of blobs) {
-        const cx  = W * (bx + ax * Math.sin(t * TAU * fx));
-        const cy  = H * (by + ay * Math.cos(t * TAU * fy));
+        const cx = W * (bx + ax * Math.sin(t * TAU * fx));
+        const cy = H * (by + ay * Math.cos(t * TAU * fy));
         const ang = ab + aa * Math.sin(t * TAU * af);
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(ang);
         ctx.scale(rx / ry, 1);
         const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, ry);
-        grad.addColorStop(0,   `rgba(0,0,0,${alpha})`);
+        grad.addColorStop(0, `rgba(0,0,0,${alpha})`);
         grad.addColorStop(0.5, `rgba(0,0,0,${alpha * 0.4})`);
-        grad.addColorStop(1,   "rgba(0,0,0,0)");
+        grad.addColorStop(1, "rgba(0,0,0,0)");
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.arc(0, 0, ry, 0, Math.PI * 2);
@@ -268,22 +285,22 @@
     ----------------------------------------------- */
     const dotCanvas = document.getElementById("bg-dots");
     const dctx = dotCanvas.getContext("2d");
-    const GRID  = 12;   /* spacing between dots */
+    const GRID = 12;   /* spacing between dots */
     const DOT_R = 1.0;  /* dot radius px */
-    const COLS  = Math.ceil(W / GRID);
-    const ROWS  = Math.ceil(H / GRID);
-    const CX    = W / 2;
-    const CY    = H / 2;
+    const COLS = Math.ceil(W / GRID);
+    const ROWS = Math.ceil(H / GRID);
+    const CX = W / 2;
+    const CY = H / 2;
     /* Max distance from center to corner */
     const MAX_D = Math.sqrt(CX * CX + CY * CY);
 
     /* Wave params */
-    const WAVE_SPEED    = 220;   /* px per second the ring travels */
-    const WAVE_WIDTH    = 160;   /* px — width of one sine lobe */
+    const WAVE_SPEED = 220;   /* px per second the ring travels */
+    const WAVE_WIDTH = 160;   /* px — width of one sine lobe */
     const WAVE_INTERVAL = 1.4;   /* seconds between successive rings */
-    const NUM_RINGS     = 4;     /* concurrent rings */
-    const BASE_ALPHA    = 0.10;  /* resting dot opacity */
-    const PEAK_ALPHA    = 0.28;  /* dot opacity at wave crest */
+    const NUM_RINGS = 4;     /* concurrent rings */
+    const BASE_ALPHA = 0.10;  /* resting dot opacity */
+    const PEAK_ALPHA = 0.28;  /* dot opacity at wave crest */
 
     function renderDots(tSec) {
       dctx.clearRect(0, 0, W, H);
@@ -297,9 +314,9 @@
           /* Sum contributions from all concurrent rings */
           let wave = 0;
           for (let k = 0; k < NUM_RINGS; k++) {
-            const ringT  = tSec - k * WAVE_INTERVAL;
-            const front  = ringT * WAVE_SPEED;          /* leading edge px */
-            const delta  = dist - front;                 /* signed dist to front */
+            const ringT = tSec - k * WAVE_INTERVAL;
+            const front = ringT * WAVE_SPEED;          /* leading edge px */
+            const delta = dist - front;                 /* signed dist to front */
             if (delta > -WAVE_WIDTH && delta < 0) {
               /* inside the ring — sine envelope, 0 at edges, 1 at center */
               const phase = (delta / WAVE_WIDTH) * Math.PI;   /* -π to 0 */
@@ -340,17 +357,17 @@
     }, 0);
 
     const PHRASE_FIXED = "Your AI for";
-    const WORD_LEVEL   = "CODING";
-    const TYPE_START   = 0.25;
-    const PHRASE_DUR   = 0.95;
-    const LEVEL_START  = TYPE_START + PHRASE_DUR;
-    const LEVEL_DUR    = 0.4;
-    const LEVEL_AT     = LEVEL_START + LEVEL_DUR;
-    const HOLD         = 0.7;
-    const SCROLL_AT    = LEVEL_AT + HOLD;
+    const WORD_LEVEL = "CODING";
+    const TYPE_START = 0.25;
+    const PHRASE_DUR = 0.95;
+    const LEVEL_START = TYPE_START + PHRASE_DUR;
+    const LEVEL_DUR = 0.4;
+    const LEVEL_AT = LEVEL_START + LEVEL_DUR;
+    const HOLD = 0.7;
+    const SCROLL_AT = LEVEL_AT + HOLD;
 
-    const typeEl   = document.getElementById("type-text");
-    const levelEl  = document.getElementById("level-text");
+    const typeEl = document.getElementById("type-text");
+    const levelEl = document.getElementById("level-text");
     const cursorEl = document.getElementById("cursor");
 
     const driver = { v: 0 };
@@ -399,7 +416,25 @@
     }
     applyTicker();
 
-    tl.set("#cursor", { opacity: 0, display: "none" }, SCROLL_AT);
+    /* Slide phrase left + reveal ticker so the full block stays centered.
+       ticker-wrap = 340px wide + 16px margin-left = 356px total extra.
+       Shift #type-line by -(356/2) = -178px so the combined block centers. */
+    const TICKER_TOTAL = (340 + 16) / 2;   /* 178px */
+    const SLIDE_DUR = 0.45;
+
+    tl.to("#type-line", {
+      x: -TICKER_TOTAL,
+      duration: SLIDE_DUR,
+      ease: "power2.inOut"
+    }, LEVEL_AT + 0.15);
+
+    tl.to("#ticker-wrap", {
+      opacity: 1,
+      duration: SLIDE_DUR,
+      ease: "power2.inOut"
+    }, LEVEL_AT + 0.15);
+
+    tl.to("#cursor", { opacity: 0, duration: 0.2, ease: "none" }, LEVEL_AT + 0.1);
 
     tl.to(scroll, {
       reveal: 1,
