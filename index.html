@@ -98,7 +98,7 @@
     #ticker-wrap {
       position: relative;
       display: inline-block;
-      width: 320px;
+      width: 420px;  /* fits REPORTING at 64px */
       height: 80px;
       margin-left: 16px;
     }
@@ -165,10 +165,11 @@
                 <span data-hf-id="hf-pgsv" id="ticker-inner">
                   <span data-hf-id="hf-lvl0" id="kw-level" class="kw-item"><span data-hf-id="hf-kyjs" id="level-text"></span><span data-hf-id="hf-42e8" id="cursor"></span></span>
                   <span data-hf-id="hf-vipr" class="kw-item">CODE</span>
-                  <span data-hf-id="hf-vaag" class="kw-item">REPORT</span>
-                  <span data-hf-id="hf-6aji" class="kw-item">DESIGN</span>
-                  <span data-hf-id="hf-ccc4" class="kw-item">VISION</span>
-                  <span data-hf-id="hf-lvl1" class="kw-item">LEVEL</span>
+                  <span data-hf-id="hf-vaag" class="kw-item">FINANCE</span>
+                  <span data-hf-id="hf-6aji" class="kw-item">EXCEL</span>
+                  <span data-hf-id="hf-ccc4" class="kw-item">REPORTING</span>
+                  <span data-hf-id="hf-b8hu" class="kw-item">DESIGN</span>
+                  <span data-hf-id="hf-lvl1" class="kw-item">MINUTES</span>
                 </span>
               </span>
             </span>
@@ -338,8 +339,8 @@
       }
     }, 0);
 
-    const PHRASE_FIXED = "Bring AI to next";
-    const WORD_LEVEL   = "LEVEL";
+    const PHRASE_FIXED = "Start working with AI in";
+    const WORD_LEVEL   = "MINUTES";
     const TYPE_START   = 0.25;
     const PHRASE_DUR   = 0.95;
     const LEVEL_START  = TYPE_START + PHRASE_DUR;
@@ -408,8 +409,8 @@
     }, SCROLL_AT - 0.1);
 
     tl.to(scroll, {
-      pos: 5,
-      duration: 2.4,
+      pos: 6,
+      duration: 2.6,
       ease: "power2.inOut",
       onUpdate: applyTicker
     }, SCROLL_AT);
